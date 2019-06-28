@@ -13,8 +13,8 @@ const router = () => {
   return (
     <HashRouter>
       <Switch>
-        {/* <Route path="/user" component={UserLayout} /> */}
-        <Route path="/view" component={BasicLayout} />
+        <Route path="/user" component={UserLayout} />
+        <Route path="/"  component={BasicLayout} />
       </Switch>
     </HashRouter>
   );

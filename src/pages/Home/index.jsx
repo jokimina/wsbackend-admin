@@ -9,6 +9,7 @@ import {
   Icon,
   Breadcrumb,
 } from '@alifd/next';
+import { fetchWaste, UpdateWaste } from '../../api/home';
 
 import styles from './index.module.scss';
 
@@ -49,34 +50,34 @@ class Home extends Component {
       isTableLoading: true,
       dataSource: [],
       current: 1,
+      pageSize: 20,
       total: 0,
+      name: '',
     };
     // 输入框
     this.value = '';
   }
 
   componentDidMount() {
-    this.getData(1, true);
+    this.init();
   }
 
-  getData(page = 1, isInit = false) {
-    if (!isInit) {
-      this.setState({
-        isTableLoading: true,
-      });
-    }
-
-    Fetch().then((data) => {
-      if (data.code === 200) {
-        const { content } = data;
-        this.setState({
-          dataSource: content.dataSource,
-          isTableLoading: false,
-          total: content.total,
-          current: page,
-        });
-      }
+  async init({
+    offset = this.getOffset(this.state.current),
+    limit = this.state.pageSize,
+    name = this.state.name } = {}) {
+    const result = await fetchWaste({ offset, limit, name });
+    const { data } = result;
+    await this.setState({
+      dataSource: data.records,
+      total: data.total_record,
+      isTableLoading: false,
+      name,
     });
+  }
+
+  getOffset = (current) => {
+    return (current - 1) * this.state.pageSize;
   }
 
   onClickDelete = () => {
@@ -95,8 +96,8 @@ class Home extends Component {
   };
 
   onSearch = () => {
-    this.value = this.state.value;
-    this.getData(1);
+    const name = this.state.value;
+    this.init({ name });
   };
 
   onInputChange = (value) => {
@@ -105,11 +106,11 @@ class Home extends Component {
 
   renderStatus = () => {
     const splitSpan = <span className={styles.split}>|</span>;
-    const view = (
-      <Link to="view" className={styles.action}>
-        查看
-      </Link>
-    );
+    // const view = (
+    //   <Link to="view" className={styles.action}>
+    //     查看
+    //   </Link>
+    // );
     const deleteItem = (
       <a
         href="javascrpt:void(0)"
@@ -126,8 +127,8 @@ class Home extends Component {
     );
     return (
       <div>
-        {view}
-        {splitSpan}
+        {/* {view} */}
+        {/* {splitSpan} */}
         {edit}
         {splitSpan}
         {deleteItem}
@@ -183,25 +184,13 @@ class Home extends Component {
             loading={isTableLoading}
             className="rhino-table"
           >
-            <Column title="DeviceID" dataIndex="deviceId" />
-            <Column title="型号ID" dataIndex="typeId" />
-            <Column title="设备型号-ID" dataIndex="modelId" />
-            <Column title="设备型号-名称" dataIndex="modelName" />
-            <Column
-              title="在线状态"
-              dataIndex="onlineStatus"
-              cell={this.renderOnlineStatus}
-            />
-            <Column
-              title="连接状态"
-              dataIndex="connectStatus"
-              cell={this.renderConnectStatus}
-            />
-            <Column
-              title="绑定状态"
-              dataIndex="boundStatus"
-              cell={this.renderBoundStatus}
-            />
+            <Column title="ID" dataIndex="ID" />
+            <Column title="创建时间" dataIndex="CreatedAt" />
+            <Column title="更新时间" dataIndex="UpdatedAt" />
+            <Column title="名称" dataIndex="name" />
+            <Column title="首字母" dataIndex="fl" />
+            <Column title="全拼" dataIndex="qp" />
+            <Column title="类型" dataIndex="cats" />
             <Column title="操作" cell={this.renderStatus} width={200} />
           </Table>
           <Pagination
