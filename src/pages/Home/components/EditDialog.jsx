@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import { Message, Dialog, Select, Button, Form, Input, Field } from '@alifd/next';
 import { addWaste, updateWaste } from '../../../api/home';
-import { wasteArr, getWasteNameByIndex } from '../../../utils/waste';
+import { wasteArr } from '../../../utils/waste';
 
 const FormItem = Form.Item;
 
@@ -29,15 +29,16 @@ export default class EditDialog extends Component {
 
       const { dataIndex } = this.state;
       values.cats = parseInt(values.cats, 0);
-      if (dataIndex) {
+      if (dataIndex > -1) {
         this.props.getFormValues(dataIndex, values);
         values = _.omit(values, ['CreatedAt', 'DeletedAt', 'UpdatedAt']);
         updateWaste(values).then(() => {
           Message.success('更新成功');
         });
       } else {
+        values = _.omit(values, ['CreatedAt', 'DeletedAt', 'UpdatedAt']);
         addWaste(values).then(() => {
-          Message.success('更新成功');
+          Message.success('添加成功');
         });
       }
       this.setState({
@@ -65,7 +66,7 @@ export default class EditDialog extends Component {
     const { index, record = { cats: 1 }, columns = [], text } = this.props;
     const data = _.mapValues(_.omit(record, 'action'), (v) => (_.isNull(v) ? '' : v));
     const selectDatasource = wasteArr.map((v, i) => {
-      return { label: getWasteNameByIndex(i), value: i };
+      return { label: v, value: i + 1 };
     });
 
     const renderColumns = _.cloneDeep(columns);
@@ -105,8 +106,8 @@ export default class EditDialog extends Component {
                             name={item.dataIndex}
                             aria-label="tag mode"
                             mode="single"
-                            // defaultValue={record && record.cats - 1 || 0}
-                            value={record.cats - 1 || 0}
+                            defaultValue={record && record.cats - 1 || 0}
+                            // value={record.cats - 1 || 0}
                             dataSource={selectDatasource}
                             style={{ width: '100%' }}
                           />
