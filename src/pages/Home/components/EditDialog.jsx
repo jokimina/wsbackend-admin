@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import { Message, Dialog, Select, Button, Form, Input, Field } from '@alifd/next';
-import { updateProject } from '../../../api/project';
+import { addWaste, updateWaste } from '../../../api/home';
+import { wasteArr, getWasteNameByIndex } from '../../../utils/waste';
 
 const FormItem = Form.Item;
 
@@ -26,10 +28,18 @@ export default class EditDialog extends Component {
       }
 
       const { dataIndex } = this.state;
-      this.props.getFormValues(dataIndex, values);
-      updateProject(values).then(() => {
-        Message.success('更新成功');
-      });
+      values.cats = parseInt(values.cats, 0);
+      if (dataIndex) {
+        this.props.getFormValues(dataIndex, values);
+        values = _.omit(values, ['CreatedAt', 'DeletedAt', 'UpdatedAt']);
+        updateWaste(values).then(() => {
+          Message.success('更新成功');
+        });
+      } else {
+        addWaste(values).then(() => {
+          Message.success('更新成功');
+        });
+      }
       this.setState({
         visible: false,
       });
@@ -52,11 +62,14 @@ export default class EditDialog extends Component {
 
   render() {
     const init = this.field.init;
-    const { index, record, columns = [] } = this.props;
+    const { index, record = { cats: 1 }, columns = [], text } = this.props;
     const data = _.mapValues(_.omit(record, 'action'), (v) => (_.isNull(v) ? '' : v));
+    const selectDatasource = wasteArr.map((v, i) => {
+      return { label: getWasteNameByIndex(i), value: i };
+    });
 
     const renderColumns = _.cloneDeep(columns);
-    _.remove(renderColumns, (n) => n.dataIndex === 'action');
+    _.remove(renderColumns, (n) => n.dataIndex === 'action' || n.dataIndex.indexOf('At') > -1 || n.dataIndex === 'ID');
     const formItemLayout = {
       labelCol: {
         fixedSpan: 6,
@@ -69,7 +82,7 @@ export default class EditDialog extends Component {
     return (
       <div style={styles.editDialog}>
         <Button type="primary" onClick={() => this.onOpen(index, data)}>
-          编辑
+          { text || '编辑' }
         </Button>
         <Dialog
           style={{ width: 640 }}
@@ -78,37 +91,39 @@ export default class EditDialog extends Component {
           closeable="esc,mask,close"
           onCancel={this.onClose}
           onClose={this.onClose}
-          title="编辑"
+          title={text || '编辑'}
         >
           {this.state.visible &&
-          <Form field={this.field}>
-            {
-            renderColumns.map((item) => {
-              return item.dataIndex !== 'action' && (
-                <FormItem label={item.title} key={item.dataIndex} {...formItemLayout}>
-                  {
-                    _.has(this.props.projectSelect, item.dataIndex) ? (
-                      <Select
-                        name={item.dataIndex}
-                        aria-label="tag mode"
-                        mode="tag"
-                        dataSource={this.props.projectSelect[item.dataIndex]}
-                        style={{ width: '100%' }}
-                      />
-                    ) : (
-                      <Input
-                        {...init(item.dataIndex,
-                        { initValue: '' },
-                    )}
-                      />
-                    )
-                  }
-                </FormItem>
-              );
-            })
+            <Form field={this.field}>
+              {
+                renderColumns.map((item) => {
+                  return item.dataIndex !== 'action' && (
+                    <FormItem label={item.title} key={item.dataIndex} {...formItemLayout}>
+                      {
+                        item.dataIndex === 'cats' ? (
+                          <Select
+                            name={item.dataIndex}
+                            aria-label="tag mode"
+                            mode="single"
+                            // defaultValue={record && record.cats - 1 || 0}
+                            value={record.cats - 1 || 0}
+                            dataSource={selectDatasource}
+                            style={{ width: '100%' }}
+                          />
+                        ) : (
+                          <Input
+                            {...init(item.dataIndex,
+                                { initValue: '' },
+                              )}
+                          />
+                          )
+                      }
+                    </FormItem>
+                  );
+                })
+              }
+            </Form>
           }
-          </Form>
-        }
         </Dialog>
       </div>
     );

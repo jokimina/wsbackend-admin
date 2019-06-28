@@ -1,47 +1,19 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Search,
-  Button,
   Table,
-  Dialog,
   Pagination,
-  Icon,
   Breadcrumb,
 } from '@alifd/next';
-import { fetchWaste, UpdateWaste } from '../../api/home';
+import DeleteBalloon from './components/DeleteBalloon';
+import EditDialog from './components/EditDialog';
+import { fetchWaste } from '../../api/home';
+import { getWasteNameByIndex } from '../../utils/waste';
+
 
 import styles from './index.module.scss';
 
-const { Column } = Table;
 const PAGESIZE = 10;
-
-// MOCK 数据，实际业务按需进行替换
-const getData = () => {
-  return Array.from({ length: 20 }).map((item, index) => {
-    return {
-      deviceId: `1000${index}`,
-      typeId: `3${index}949245${index}`,
-      modelId: `TAOBAO122${index}`,
-      modelName: '测试设备',
-      onlineStatus: '在线',
-      connectStatus: '已连接',
-      boundStatus: '未绑定',
-    };
-  });
-};
-const Fetch = () =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        code: 200,
-        content: {
-          total: 88,
-          dataSource: getData(),
-        },
-      });
-    }, 1000);
-  });
 
 class Home extends Component {
   constructor(props) {
@@ -53,9 +25,63 @@ class Home extends Component {
       pageSize: 20,
       total: 0,
       name: '',
+      value: '',
     };
-    // 输入框
-    this.value = '';
+    this.columns = [
+      {
+        title: 'ID',
+        dataIndex: 'ID',
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'CreatedAt',
+      },
+      {
+        title: '更新时间',
+        dataIndex: 'UpdatedAt',
+      },
+      {
+        title: '名称',
+        dataIndex: 'name',
+      },
+      {
+        title: '首字母',
+        dataIndex: 'fl',
+      },
+      {
+        title: '全拼',
+        dataIndex: 'qp',
+      },
+      {
+        title: '类型',
+        dataIndex: 'cats',
+        render: (dataIndex, value) => {
+          const i = parseInt(value, 0);
+          return i < 0 ? i : getWasteNameByIndex(i - 1);
+        },
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+        key: 'action',
+        render: (dataIndex, value, index, record) => {
+          return (
+            <span>
+              <EditDialog
+                index={index}
+                record={record}
+                projectSelect={this.state.projectSelect}
+                getFormValues={this.getFormValues}
+                columns={this.columns}
+              />
+              <DeleteBalloon
+                handleRemove={() => this.handleRemove(value, index, record)}
+              />
+            </span>
+          );
+        },
+      },
+    ];
   }
 
   componentDidMount() {
@@ -80,19 +106,13 @@ class Home extends Component {
     return (current - 1) * this.state.pageSize;
   }
 
-  onClickDelete = () => {
-    Dialog.confirm({
-      title: '操作',
-      style: { width: '250px' },
-      content: '是否要删除该数据',
-      onOk: () => {
-        // 发送删除请求-loading-删除成功
-      },
-    });
-  };
-
   onPaginationChange = (page) => {
-    this.getData(page);
+    this.setState(
+      {
+        current: page,
+      }
+    );
+    this.init();
   };
 
   onSearch = () => {
@@ -104,57 +124,21 @@ class Home extends Component {
     this.setState({ value });
   };
 
-  renderStatus = () => {
-    const splitSpan = <span className={styles.split}>|</span>;
-    // const view = (
-    //   <Link to="view" className={styles.action}>
-    //     查看
-    //   </Link>
-    // );
-    const deleteItem = (
-      <a
-        href="javascrpt:void(0)"
-        className={styles.action}
-        onClick={this.onClickDelete}
-      >
-        删除
-      </a>
-    );
-    const edit = (
-      <Link to="edit" className={styles.action}>
-        编辑
-      </Link>
-    );
-    return (
-      <div>
-        {/* {view} */}
-        {/* {splitSpan} */}
-        {edit}
-        {splitSpan}
-        {deleteItem}
-      </div>
-    );
+  getFormValues = (dataIndex, values) => {
+    const { dataSource } = this.state;
+    dataSource[dataIndex] = values;
+    this.setState({
+      dataSource,
+    });
   };
 
-  renderOnlineStatus = (value) => {
-    return (
-      <span style={{ color: '#ee6f6d', fontWeight: 'bold' }}>
-        <i className={styles.dot} />
-        {value}
-      </span>
-    );
-  };
+  // defaultCellRender = (dataIndex, value, index, record) => {
+  // return (<Tag type="primary" size="small">{record[dataIndex]}</Tag>);
+  // }
+  defaultCellRender = (dataIndex, value) => value
 
-  renderBoundStatus = (value) => {
-    return <span style={{ color: '#999' }}>{value}</span>;
-  };
-
-  renderConnectStatus = (value) => {
-    return <span style={{ color: '#57ca9a' }}>{value}</span>;
-  };
 
   render() {
-    const { value, isTableLoading, total, current, dataSource } = this.state;
     return (
       <div className={styles.container}>
         <Breadcrumb className={styles.Breadcrumb}>
@@ -165,39 +149,44 @@ class Home extends Component {
             <Search
               type="primary"
               placeholder="中文名／ID"
-              value={value}
+              value={this.state.value}
               onChange={this.onInputChange}
               onSearch={this.onSearch}
               searchText="搜索"
             />
-            <Link to="/edit">
-              <Button type="primary">
-                <Icon type="add" size="xs" style={{ marginRight: '4px' }} />
-                新增
-              </Button>
-            </Link>
+            <EditDialog
+              columns={this.columns}
+              text="新增"
+            />
           </div>
           <Table
+            dataSource={this.state.dataSource}
             hasBorder={false}
-            isZebra={false}
-            dataSource={dataSource}
-            loading={isTableLoading}
-            className="rhino-table"
+            loading={this.state.isTableLoading}
           >
-            <Column title="ID" dataIndex="ID" />
-            <Column title="创建时间" dataIndex="CreatedAt" />
-            <Column title="更新时间" dataIndex="UpdatedAt" />
-            <Column title="名称" dataIndex="name" />
-            <Column title="首字母" dataIndex="fl" />
-            <Column title="全拼" dataIndex="qp" />
-            <Column title="类型" dataIndex="cats" />
-            <Column title="操作" cell={this.renderStatus} width={200} />
+            {
+              this.columns.map((column) => {
+                if (_.has(column, 'show') && !column.show) return null;
+                let cellRender = this.defaultCellRender;
+                if (typeof column.render === 'function') {
+                  cellRender = column.render;
+                }
+                return (
+                  <Table.Column
+                    title={column.title}
+                    key={column.dataIndex}
+                    dataIndex={column.dataIndex}
+                    cell={cellRender.bind(this, column.dataIndex)}
+                  />
+                );
+              })
+            }
           </Table>
           <Pagination
             className={styles.pagination}
-            current={current}
+            current={this.state.current}
             onChange={this.onPaginationChange}
-            total={total}
+            total={this.state.total}
             pageSize={PAGESIZE}
           />
         </div>

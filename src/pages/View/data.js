@@ -11,19 +11,19 @@ export const mockTableData = [
     typeName: '属性',
     name: '6-26属性测试01',
     identifier: '10001',
-    desc: '设备正常',
+    desc: '垃圾正常',
   },
   {
     typeName: '属性',
     name: '6-26属性测试02',
     identifier: '10002',
-    desc: '设备测试中',
+    desc: '垃圾测试中',
   },
   {
     typeName: '属性',
     name: '6-26属性测试03',
     identifier: '10003',
-    desc: '设备停用',
+    desc: '垃圾停用',
   },
 ];
 
@@ -44,6 +44,6 @@ export const dialogFormConfig = {
     identifier: '标示符',
     typeName: '功能类型',
     name: '功能名称',
-    desc: '设备描述',
+    desc: '垃圾描述',
   },
 };

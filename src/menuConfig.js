@@ -24,15 +24,15 @@ const asideMenuConfig = [
   //   path: '/dashboard',
   // },
   {
-    name: '设备管理',
+    name: '垃圾管理',
     path: '/home',
   },
-  {
-    name: '设备编辑',
-    path: '/edit',
-  },
   // {
-  //   name: '设备查看',
+  //   name: '垃圾编辑',
+  //   path: '/edit',
+  // },
+  // {
+  //   name: '垃圾查看',
   //   path: '/view',
   // },
 ];

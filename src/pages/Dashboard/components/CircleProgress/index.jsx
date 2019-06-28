@@ -17,7 +17,7 @@ export default class CircleProgress extends Component {
                 state="error"
                 size="large"
               />
-              <h6 className={styles.title}>设备 A</h6>
+              <h6 className={styles.title}>垃圾 A</h6>
             </div>
           </IceContainer>
         </Col>
@@ -26,7 +26,7 @@ export default class CircleProgress extends Component {
           <IceContainer>
             <div className={styles.item}>
               <Progress percent={50} shape="circle" size="large" />
-              <h6 className={styles.title}>设备 B</h6>
+              <h6 className={styles.title}>垃圾 B</h6>
             </div>
           </IceContainer>
         </Col>
@@ -40,7 +40,7 @@ export default class CircleProgress extends Component {
                 state="success"
                 size="large"
               />
-              <h6 className={styles.title}>设备 C</h6>
+              <h6 className={styles.title}>垃圾 C</h6>
             </div>
           </IceContainer>
         </Col>

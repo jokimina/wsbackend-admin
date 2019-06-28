@@ -49,7 +49,7 @@ export default class DonationForm extends Component {
   render() {
     return (
       <IceContainer>
-        <div className={styles.title}>设备编辑</div>
+        <div className={styles.title}>垃圾编辑</div>
         <IceFormBinderWrapper
           value={this.state.value}
           onChange={this.formChange}
@@ -57,15 +57,15 @@ export default class DonationForm extends Component {
         >
           <div className={styles.formContent}>
             <div className={styles.formItem}>
-              <div className={styles.formLabel}>设备型号-名称</div>
+              <div className={styles.formLabel}>垃圾型号-名称</div>
               <IceFormBinder
                 required
                 triggerType="onBlur"
-                message="设备名称不能为空"
+                message="垃圾名称不能为空"
                 name="modelName"
               >
                 <Input
-                  placeholder="请输入设备名称"
+                  placeholder="请输入垃圾名称"
                   style={{ width: '400px' }}
                 />
               </IceFormBinder>
@@ -74,15 +74,15 @@ export default class DonationForm extends Component {
               </div>
             </div>
             <div className={styles.formItem}>
-              <div className={styles.formLabel}>设备型号-ID</div>
+              <div className={styles.formLabel}>垃圾型号-ID</div>
               <IceFormBinder
                 required
                 triggerType="onBlur"
-                message="设备型号-ID不能为空"
+                message="垃圾型号-ID不能为空"
                 name="modelId"
               >
                 <Input
-                  placeholder="请输入设备型号-ID"
+                  placeholder="请输入垃圾型号-ID"
                   style={{ width: '400px' }}
                 />
               </IceFormBinder>
@@ -91,7 +91,7 @@ export default class DonationForm extends Component {
               </div>
             </div>
             <div className={styles.formItem}>
-              <div className={styles.formLabel}>设备类别</div>
+              <div className={styles.formLabel}>垃圾类别</div>
               <IceFormBinder name="cate">
                 <Select
                   placeholder="请选择"
@@ -105,7 +105,7 @@ export default class DonationForm extends Component {
               </IceFormBinder>
             </div>
             <div className={styles.formItem}>
-              <div className={styles.formLabel}>设备责任人</div>
+              <div className={styles.formLabel}>垃圾责任人</div>
               <IceFormBinder
                 required
                 name="responsible"
@@ -119,7 +119,7 @@ export default class DonationForm extends Component {
               </div>
             </div>
             <div className={styles.formItem}>
-              <div className={styles.formLabel}>设备生产时间</div>
+              <div className={styles.formLabel}>垃圾生产时间</div>
               <IceFormBinder name="time">
                 <DatePicker style={{ width: '400px' }} />
               </IceFormBinder>

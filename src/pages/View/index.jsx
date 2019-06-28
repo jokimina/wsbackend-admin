@@ -1,5 +1,5 @@
 /**
- * 行业级设备模型查看页
+ * 行业级垃圾模型查看页
  */
 import React, { Component } from 'react';
 import { Table, Dialog, Breadcrumb } from '@alifd/next';

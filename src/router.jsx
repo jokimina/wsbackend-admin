@@ -14,7 +14,7 @@ const router = () => {
     <HashRouter>
       <Switch>
         <Route path="/user" component={UserLayout} />
-        <Route path="/"  component={BasicLayout} />
+        <Route path="/" component={BasicLayout} />
       </Switch>
     </HashRouter>
   );

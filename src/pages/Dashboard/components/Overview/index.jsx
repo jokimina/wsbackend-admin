@@ -19,7 +19,7 @@ export default class Overview extends Component {
           </Col>
 
           <Col xxs="12" s="12" l="6" className={styles.textCardItem}>
-            <div className={styles.textCardSubtitle}>对接设备时间</div>
+            <div className={styles.textCardSubtitle}>对接垃圾时间</div>
             <div className={styles.textCardTitle}>
               <span className={styles.textCardNumber}>32</span>
               分钟

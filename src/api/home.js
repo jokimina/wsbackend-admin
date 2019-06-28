@@ -4,13 +4,23 @@ export async function fetchWaste(params) {
   return axios({
     url: '/api/waste',
     method: 'get',
-    params, 
+    params,
   }).then(response => {
     return response.data;
   });
 }
 
-export async function UpdateWaste(data) {
+export async function addWaste(data) {
+  return axios({
+    url: '/api/waste',
+    method: 'post',
+    data,
+  }).then(response => {
+    return response.data;
+  });
+}
+
+export async function updateWaste(data) {
   return axios({
     url: `/api/waste/${data.ID}`,
     method: 'post',
