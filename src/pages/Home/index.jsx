@@ -3,11 +3,13 @@ import {
   Search,
   Table,
   Pagination,
+  Button,
   Breadcrumb,
+  Message,
 } from '@alifd/next';
 import DeleteBalloon from './components/DeleteBalloon';
 import EditDialog from './components/EditDialog';
-import { fetchWaste } from '../../api/home';
+import { fetchWaste, reloadWaste } from '../../api/home';
 import { getWasteNameByIndex } from '../../utils/waste';
 
 
@@ -91,8 +93,9 @@ class Home extends Component {
   async init({
     offset = this.getOffset(this.state.current),
     limit = this.state.pageSize,
+    page = this.state.current,
     name = this.state.name } = {}) {
-    const result = await fetchWaste({ offset, limit, name });
+    const result = await fetchWaste({ offset, limit, name, page });
     const { data } = result;
     await this.setState({
       dataSource: data.records,
@@ -110,9 +113,10 @@ class Home extends Component {
     this.setState(
       {
         current: page,
+        isTableLoading: true,
       }
     );
-    this.init();
+    this.init({ offset: this.getOffset(page), page });
   };
 
   onSearch = () => {
@@ -132,11 +136,13 @@ class Home extends Component {
     });
   };
 
-  // defaultCellRender = (dataIndex, value, index, record) => {
-  // return (<Tag type="primary" size="small">{record[dataIndex]}</Tag>);
-  // }
   defaultCellRender = (dataIndex, value) => value
 
+  reloadData = () => {
+    reloadWaste().then(() => {
+      Message.success('数据已刷新');
+    });
+  }
 
   render() {
     return (
@@ -154,6 +160,9 @@ class Home extends Component {
               onSearch={this.onSearch}
               searchText="搜索"
             />
+            <Button type="primary" onClick={this.reloadData}>
+              更新数据
+            </Button>
             <EditDialog
               columns={this.columns}
               text="新增"
@@ -166,7 +175,7 @@ class Home extends Component {
           >
             {
               this.columns.map((column) => {
-                if (_.has(column, 'show') && !column.show) return null;
+                if (('show' in column) && !column.show) return null;
                 let cellRender = this.defaultCellRender;
                 if (typeof column.render === 'function') {
                   cellRender = column.render;

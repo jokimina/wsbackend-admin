@@ -1,5 +1,15 @@
 import axios from 'axios';
 
+
+export async function reloadWaste() {
+  return axios({
+    url: '/api/waste/reload',
+    method: 'get',
+  }).then(response => {
+    return response.data;
+  });
+}
+
 export async function fetchWaste(params) {
   return axios({
     url: '/api/waste',
