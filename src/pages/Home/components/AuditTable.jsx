@@ -7,7 +7,7 @@ import {
   Message,
   Select,
 } from '@alifd/next';
-import { fetchWaste, reloadWaste, auditWaste } from '../../../api/home';
+import { fetchWaste, reloadWaste, auditWaste, auditBatchWaste } from '../../../api/home';
 import { wasteArr } from '../../../utils/waste';
 
 
@@ -25,6 +25,7 @@ class AuditTable extends Component {
     this.state = {
       isTableLoading: true,
       dataSource: [],
+      selectedList: [],
       current: 1,
       pageSize: 20,
       total: 0,
@@ -134,6 +135,31 @@ class AuditTable extends Component {
     this.setState({ dataSource });
   }
 
+  auditBatch = (status) => {
+    const records = this.state.selectedList;
+    const data = records.map(v => {
+      return {
+        ID: v.ID,
+        cats: v.cats,
+        status,
+      };
+    });
+    auditBatchWaste(data).then(() => {
+      Message.success(`批量${status === 'online' ? '通过':'拒绝'}成功`);
+    });
+  }
+
+
+  rowSelection = {
+    onChange: (rowKeys, records) => {
+      // console.log(rowKeys);
+      // console.log(records);
+      this.setState({
+        selectedList: records,
+      });
+    },
+  };
+
   onCatChange = (index, value) => {
     const dataSource = this.state.dataSource;
     dataSource[index].cats = value;
@@ -198,7 +224,9 @@ class AuditTable extends Component {
           </Button>
         </div>
         <Table
+          primaryKey="ID"
           dataSource={this.state.dataSource}
+          rowSelection={this.rowSelection}
           hasBorder={false}
           loading={this.state.isTableLoading}
         >
@@ -220,13 +248,21 @@ class AuditTable extends Component {
             })
           }
         </Table>
-        <Pagination
-          className={styles.pagination}
-          current={this.state.current}
-          onChange={this.onPaginationChange}
-          total={this.state.total}
-          pageSize={PAGESIZE}
-        />
+        <div>
+          <Button type="primary" onClick={this.auditBatch.bind(this, 'online')} style={{ margin: '5px' }}>
+            通过已选
+          </Button>
+          <Button type="primary" warning onClick={this.auditBatch.bind(this, 'deny')}>
+            拒绝已选
+          </Button>
+          <Pagination
+            className={styles.pagination}
+            current={this.state.current}
+            onChange={this.onPaginationChange}
+            total={this.state.total}
+            pageSize={PAGESIZE}
+          />
+        </div>
       </div>
     );
   }

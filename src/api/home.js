@@ -49,3 +49,13 @@ export async function auditWaste(data) {
     return response.data;
   });
 }
+
+export async function auditBatchWaste(data) {
+  return axios({
+    url: '/api/audit/batch/waste',
+    method: 'post',
+    data,
+  }).then(response => {
+    return response.data;
+  });
+}
