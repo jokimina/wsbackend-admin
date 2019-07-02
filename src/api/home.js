@@ -39,3 +39,13 @@ export async function updateWaste(data) {
     return response.data;
   });
 }
+
+export async function auditWaste(data) {
+  return axios({
+    url: '/api/audit/waste',
+    method: 'post',
+    data,
+  }).then(response => {
+    return response.data;
+  });
+}
